@@ -1,13 +1,12 @@
 from flask import Flask, request, jsonify
 from flask_restful import Api, Resource
-from flask_cors import CORS
+
 import requests
 import base64
 import datetime
 import json
 
 app = Flask(__name__)
-CORS(app)
 api = Api(app)
 
 # M-Pesa Credentials and Constants
