@@ -9,6 +9,7 @@ requests = "*"
 flask-restful = "*"
 honcho = "*"
 gunicorn = "*"
+flask-cors = "*"
 
 [dev-packages]
 

@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_restful import Api, Resource
-
+from flask_cors import CORS
 import requests
 import base64
 import datetime
@@ -8,6 +8,8 @@ import json
 
 app = Flask(__name__)
 api = Api(app)
+CORS(app, resources={r"/api/*": {"origins": "https://mpesa-ui.vercel.app"}})
+
 
 # M-Pesa Credentials and Constants
 CONSUMER_KEY = 'C77Sai2IlV9JCjXqQAvlbv2NN4bKAVVMM6sKyurXmTWzrycS'
