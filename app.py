@@ -21,8 +21,23 @@ def get_access_token():
     api_url = 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials'
     credentials = base64.b64encode(f'{CONSUMER_KEY}:{CONSUMER_SECRET}'.encode()).decode('utf-8')
     headers = {'Authorization': f'Basic {credentials}'}
-    response = requests.get(api_url, headers=headers)
-    return response.json().get('access_token')
+    try:
+        response = requests.get(api_url, headers=headers)
+        response.raise_for_status()  # Checks for HTTP errors
+        return response.json().get('access_token')
+    except requests.exceptions.HTTPError as errh:
+        print("HTTP Error:", errh)
+    except requests.exceptions.ConnectionError as errc:
+        print("Error Connecting:", errc)
+    except requests.exceptions.Timeout as errt:
+        print("Timeout Error:", errt)
+    except requests.exceptions.RequestException as err:
+        print("OOps: Something Else", err)
+    except json.decoder.JSONDecodeError as e:
+        print('Decoding JSON has failed:', e)
+        print('Response Content:', response.content)  # This line will print the raw response content
+        return None
+
 
 def stk_push(phone_number, amount=1):
     access_token = get_access_token()
