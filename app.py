@@ -15,7 +15,7 @@ CONSUMER_KEY = 'C77Sai2IlV9JCjXqQAvlbv2NN4bKAVVMM6sKyurXmTWzrycS'
 CONSUMER_SECRET = 'GyhAqxgQVmi6Km2VrtxawVOqx6DlE8mSyBj590qhaMftCdnia9InxMpbpyLGwG2m'
 BUSINESS_SHORT_CODE = '174379'
 LIPA_NA_MPESA_PASSKEY = 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919'  
-CALLBACK_URL = 'https://job-seeking-57c5.onrender.com/stk-callback'
+CALLBACK_URL = 'https://mpesa-8s4l.onrender.com/stk-callback'
 
 def get_access_token():
     api_url = 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials'
