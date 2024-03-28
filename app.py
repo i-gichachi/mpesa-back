@@ -21,11 +21,28 @@ def get_access_token():
     api_url = 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials'
     credentials = base64.b64encode(f'{CONSUMER_KEY}:{CONSUMER_SECRET}'.encode()).decode('utf-8')
     headers = {'Authorization': f'Basic {credentials}'}
-    response = requests.get(api_url, headers=headers)
-    return response.json().get('access_token')
+    try:
+        response = requests.get(api_url, headers=headers, timeout=10) # 10 seconds timeout
+        response.raise_for_status()  # Check for HTTP errors
+        return response.json().get('access_token')
+    except requests.exceptions.HTTPError as err:
+        app.logger.error(f'HTTP Error: {err}')
+    except requests.exceptions.ConnectionError as err:
+        app.logger.error(f'Error Connecting: {err}')
+    except requests.exceptions.Timeout as err:
+        app.logger.error(f'Timeout Error: {err}')
+    except requests.exceptions.RequestException as err:
+        app.logger.error(f'Oops: Something Else: {err}')
+    except json.decoder.JSONDecodeError as e:
+        app.logger.error(f'Decoding JSON has failed: {e}')
+        app.logger.error(f'Response Content: {response.content}')
+    return None
 
-def stk_push(phone_number, amount=""):
+def stk_push(phone_number, amount):
     access_token = get_access_token()
+    if not access_token:
+        return {"error": "Failed to obtain access token"}, 500
+
     api_url = 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest'
     headers = {'Authorization': f'Bearer {access_token}'}
 
@@ -37,17 +54,22 @@ def stk_push(phone_number, amount=""):
         'Password': password,
         'Timestamp': timestamp,
         'TransactionType': 'CustomerPayBillOnline',
-        'Amount': amount,  
-        'PartyA': phone_number,  
+        'Amount': amount,
+        'PartyA': phone_number,
         'PartyB': BUSINESS_SHORT_CODE,
-        'PhoneNumber': phone_number, 
+        'PhoneNumber': phone_number,
         'CallBackURL': CALLBACK_URL,
         'AccountReference': 'Donation',
         'TransactionDesc': 'Donating'
     }
 
-    response = requests.post(api_url, json=payload, headers=headers)
-    return response.json()
+    try:
+        response = requests.post(api_url, json=payload, headers=headers, timeout=10) # 10 seconds timeout
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        app.logger.error(f"Error sending STK push request: {e}")
+        return {"error": "Error sending STK push request"}, 500
 
 class STKPushResource(Resource):
     def post(self):
