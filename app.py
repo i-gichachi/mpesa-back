@@ -14,7 +14,7 @@ api = Api(app)
 CONSUMER_KEY = 'C77Sai2IlV9JCjXqQAvlbv2NN4bKAVVMM6sKyurXmTWzrycS'
 CONSUMER_SECRET = 'GyhAqxgQVmi6Km2VrtxawVOqx6DlE8mSyBj590qhaMftCdnia9InxMpbpyLGwG2m'
 BUSINESS_SHORT_CODE = '174379'
-LIPA_NA_MPESA_PASSKEY = 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919'  
+LIPA_NA_MPESA_PASSKEY = 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919'
 CALLBACK_URL = 'https://mpesa-8s4l.onrender.com/stk-callback'
 
 def get_access_token():
@@ -23,21 +23,20 @@ def get_access_token():
     headers = {'Authorization': f'Basic {credentials}'}
     try:
         response = requests.get(api_url, headers=headers)
-        response.raise_for_status()  # Checks for HTTP errors
+        response.raise_for_status()
         return response.json().get('access_token')
-    except requests.exceptions.HTTPError as errh:
-        print("HTTP Error:", errh)
-    except requests.exceptions.ConnectionError as errc:
-        print("Error Connecting:", errc)
-    except requests.exceptions.Timeout as errt:
-        print("Timeout Error:", errt)
+    except requests.exceptions.HTTPError as err:
+        app.logger.error(f'HTTP Error: {err}')
+    except requests.exceptions.ConnectionError as err:
+        app.logger.error(f'Error Connecting: {err}')
+    except requests.exceptions.Timeout as err:
+        app.logger.error(f'Timeout Error: {err}')
     except requests.exceptions.RequestException as err:
-        print("OOps: Something Else", err)
+        app.logger.error(f'Oops: Something Else: {err}')
     except json.decoder.JSONDecodeError as e:
-        print('Decoding JSON has failed:', e)
-        print('Response Content:', response.content)  # This line will print the raw response content
-        return None
-
+        app.logger.error(f'Decoding JSON has failed: {e}')
+        app.logger.error(f'Response Content: {response.content}')
+    return None
 
 def stk_push(phone_number, amount=1):
     access_token = get_access_token()
